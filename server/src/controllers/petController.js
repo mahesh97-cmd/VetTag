@@ -16,7 +16,7 @@ const addPet = async (req, res) => {
       dietaryNotes,
     } = req.body;
 
-    const owner = req.body.id;
+    const owner = req.user.id;
 
     const qrCodeId = owner + "-" + Date.now();
     const qrCodeData = await QRCode.toDataURL(qrCodeId);
@@ -54,4 +54,152 @@ const addPet = async (req, res) => {
   }
 };
 
-module.exports = { addPet };
+const getPetsByUserId=async(req,res)=>{
+  try {
+    const userId = req.user.id;
+
+
+    const pets=await Pet.find({owner:userId}).populate("owner", "name phone email")
+     if (!pets || pets.length === 0) {
+      return res.status(404).json({ message: "No pets found." });
+    }
+    res.status(200).json({pets})
+  } catch (error) {
+     console.error("Error fetching pets:", error);
+    res.status(500).json({ message: "Server error fetching pets." });
+  }
+}
+
+
+const updatePetDetails = async (req, res) => {
+  try {
+    const { petId } = req.params;
+    const {
+      name,
+      breed,
+      age,
+      gender,
+      imageUrl,
+      vaccinations,
+      allergies,
+      dietaryNotes,
+      lost,
+      lastSeenCoordinates 
+    } = req.body;
+
+    const updatedFields = {
+      ...(name && { name }),
+      ...(breed && { breed }),
+      ...(age && { age }),
+      ...(gender && { gender }),
+      ...(imageUrl && { imageUrl }),
+      ...(vaccinations && { vaccinations }),
+      ...(allergies && { allergies }),
+      ...(dietaryNotes && { dietaryNotes }),
+      ...(typeof lost === "boolean" && { lost }),
+      ...(lastSeenCoordinates && {
+        lastSeenLocation: {
+          type: "Point",
+          coordinates: lastSeenCoordinates
+        }
+      })
+    };
+
+    const updatedPet = await Pet.findByIdAndUpdate(
+      petId,
+      { $set: updatedFields },
+      { new: true }
+    );
+
+    if (!updatedPet) {
+      return res.status(404).json({ message: "Pet not found." });
+    }
+
+    res.status(200).json({ message: "Pet updated successfully", pet: updatedPet });
+  } catch (error) {
+    console.error("Error updating pet:", error);
+    res.status(500).json({ message: "Server error updating pet." });
+  }
+};
+
+const getSinglepet=async(req,res)=>{
+try {
+  const {petId}=req.params;
+  const userId=req.user.id
+  const pet =await Pet.findById(petId).populate("owner", "name email phone")
+  if(!pet){
+    return res.status(404).json({message:"Pet Not Found"})
+  }
+  if(pet.owner.id.toString() !==userId){
+    return res.status(403).json({message:"Access denied"})
+  }
+res.status(200).json({pet})
+} catch (error) {
+  console.error("Error fetching pet:", error);
+    res.status(500).json({ message: "Server error fetching pet" });
+}
+}
+
+const deletePet = async (req, res) => {
+  try {
+    const { petId } = req.params;
+    const userId = req.user.id;
+
+    const pet = await Pet.findById(petId);
+    if (!pet) {
+      return res.status(404).json({ message: "Pet not found" });
+    }
+
+    if (pet.owner.toString() !== userId) {
+      return res.status(403).json({ message: "You are not authorized to delete this pet" });
+    }
+
+    await Pet.findByIdAndDelete(petId);
+
+    await User.findByIdAndUpdate(userId, { $pull: { pets: petId } });
+
+    res.status(200).json({ message: "Pet deleted successfully" });
+  } catch (error) {
+    console.error("Delete pet error:", error);
+    res.status(500).json({ message: "Server error deleting pet" });
+  }
+};
+
+const getLostPetsNearby = async (req, res) => {
+  try {
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ message: "Latitude and Longitude are required." });
+    }
+
+    const pets = await Pet.find({
+      lost: true,
+      lastSeenLocation: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(lng), parseFloat(lat)]
+          },
+          $maxDistance: 5000 
+        }
+      }
+    }).populate("owner", "name phone email");
+
+    res.status(200).json({ pets });
+  } catch (error) {
+    console.error("GeoQuery error:", error);
+    res.status(500).json({ message: "Server error fetching nearby lost pets." });
+  }
+};
+
+
+
+module.exports = {
+  addPet,
+  getPetsByUserId,
+  updatePetDetails,
+  getSinglepet,
+  deletePet,
+  getLostPetsNearby
+};

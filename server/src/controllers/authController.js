@@ -7,7 +7,7 @@ const registerUser = async (req, res) => {
     const { email, password, name, phone } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: "user is already exist" });
+     return res.status(400).json({ message: "user is already exist" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -32,12 +32,12 @@ try {
 
     const user=await User.findOne({email})
     if(!user){
-        res.status(404).json({message:"user not found"})
+       return res.status(404).json({message:"user not found"})
     }
 
     const isMatched=await bcrypt.compare(password,user.password)
     if(!isMatched){
-        res.status(401).json({message:"invalid creditials"})
+       return res.status(401).json({message:"invalid creditials"})
     }
     const token=jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:"7d"})
 
@@ -45,7 +45,7 @@ try {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
 
     res.status(200).json({
