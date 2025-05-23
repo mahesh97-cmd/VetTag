@@ -314,6 +314,35 @@ const addVaccination = async (req, res) => {
   }
 };
 
+
+const markAsFound = async (req, res) => {
+  try {
+    const { petId } = req.params;
+    const userId = req.user.id;
+
+    const pet = await Pet.findById(petId);
+
+    if (!pet) {
+      return res.status(404).json({ message: "Pet not found." });
+    }
+
+    if (pet.owner.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized: You are not the owner of this pet." });
+    }
+
+    pet.lost = false;
+    await pet.save();
+
+    res.status(200).json({ message: "Pet marked as found.", pet });
+  } catch (error) {
+    console.error("Error marking pet as lost:", error);
+    res.status(500).json({ message: "Server error marking pet as lost." });
+  }
+};
+
+
 module.exports = {
   addPet,
   getPetsByUserId,
@@ -324,4 +353,5 @@ module.exports = {
   getPetByQrCodeId,
   markPetAsLost,
   addVaccination,
+  markAsFound
 };
