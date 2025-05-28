@@ -24,7 +24,7 @@ const Navbar = () => {
           Dashboard
         </Link>
         <Link
-          to="/add-pet"
+          to="/addpets"
           className="text-gray-800 hover:text-cyan-600 transition "
         >
           Add Pet
@@ -70,7 +70,7 @@ const Navbar = () => {
               Dashboard
             </Link>
             <Link
-              to="/add-pet"
+              to="/addpets"
               onClick={toggleMenu}
               className="block px-4 py-2 rounded-md text-gray-800 text-lg hover:bg-red-500 hover:text-white transition"
             >
