@@ -30,7 +30,7 @@ const loginUser=async(req,res)=>{
 try {
     const {email,password}=req.body
 
-    const user=await User.findOne({email})
+    const user=await User.findOne({email}).select("+password")
     if(!user){
        return res.status(404).json({message:"user not found"})
     }
@@ -47,9 +47,10 @@ try {
       sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
-
+    const safeUser = await User.findById(user._id).select("-password");
     res.status(200).json({
-        message:"Login Successful"
+        message:"Login Successful",
+        user:safeUser
     })
 
 } catch (error) {

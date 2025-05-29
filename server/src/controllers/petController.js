@@ -18,6 +18,15 @@ const addPet = async (req, res) => {
 
     const owner = req.user.id;
 
+
+     let uploadedPetImageUrl = imageUrl;
+    if (imageUrl) {
+      const petImageUpload = await cloudinary.uploader.upload(imageUrl, {
+        folder: "vetTag/pets",
+      });
+      uploadedPetImageUrl = petImageUpload.secure_url;
+    }
+
     const qrCodeId = `${owner}-${Date.now()}`;
     const qrCodeUrl = `https://vetTag.com/pet/${qrCodeId}`;
 
@@ -33,7 +42,7 @@ const addPet = async (req, res) => {
       breed,
       age,
       gender,
-      imageUrl,
+      imageUrl:uploadedPetImageUrl,
       vaccinations,
       allergies,
       dietaryNotes,
