@@ -1,69 +1,83 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-
+// src/pages/Register.jsx
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleRegister = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Registered!");
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
+        form,
+        { withCredentials: true }
+      );
+      if (res?.status === 201) {
+        toast.success("Registered successfully!")
+        navigate("/login");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed.");
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-cyan-50">
-      <div className="flex-1 flex justify-center items-center p-8">
-        <div className="w-full max-w-md">
-          <h2 className="text-3xl font-bold text-cyan-600 mb-6">Register</h2>
-          <form onSubmit={handleRegister} className="space-y-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            />
-            <button
-              type="submit"
-              className="w-full bg-cyan-400 hover:bg-cyan-500 text-white font-semibold py-2 rounded-lg transition"
-            >
-              Register
-            </button>
-          </form>
-          <p className="text-sm mt-4 text-center text-gray-600">
-            Already have an account?{" "}
-            <Link to="/login" className="text-cyan-500 hover:underline">
-              Login
-            </Link>
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-cyan-100 p-6">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-cyan-700 mb-6 text-center">
+          Register for VetTag 🐾
+        </h2>
 
-      <div className="hidden md:block w-1/2 bg-cyan-400">
-        <img
-          src="/vet-register.jpg"
-          alt="Register"
-          className="object-cover w-full h-full"
-        />
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            name="name"
+            placeholder="Full Name"
+            className="w-full p-3 border rounded-lg"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            name="email"
+            placeholder="Email"
+            type="email"
+            className="w-full p-3 border rounded-lg"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            name="password"
+            placeholder="Password"
+            type="password"
+            className="w-full p-3 border rounded-lg"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-cyan-600 text-white p-3 rounded-lg hover:bg-cyan-700 transition"
+          >
+            Register
+          </button>
+        </form>
+
+        <p className="text-sm mt-4 text-center">
+          Already have an account?{" "}
+          <Link to="/login" className="text-cyan-600 hover:underline">
+            Login here
+          </Link>
+        </p>
       </div>
     </div>
   );

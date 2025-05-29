@@ -8,22 +8,29 @@ import HowItWorks from "./components/HowItsWork";
 import AddPets from "./components/AddPets";
 import Login from "./components/Login";
 import Register from "./components/Register";
-
+import MyPets from "./components/Mypets";
+import appStore from "./utils/appStore";
+import { Provider } from "react-redux";
+import {Toaster} from "react-hot-toast"
 const App = () => {
   return (
-    <BrowserRouter basename="/">
-      <Routes>
-        <Route path="/" element={<Body />}>
-          <Route index element={<Home />} />
-          <Route Path="/features" element={<Features />} />
-          <Route Path="/howItsWork" element={<HowItWorks />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/addpets" element={<AddPets/>}/>
-      </Routes>
-    </BrowserRouter>
+    <Provider store={appStore}>
+      <BrowserRouter basename="/">
+      <Toaster position="top-center"/>
+        <Routes>
+          <Route path="/" element={<Body />}>
+            <Route index element={<Home />} />
+            <Route Path="/features" element={<Features />} />
+            <Route Path="/howItsWork" element={<HowItWorks />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/addpets" element={<AddPets />} />
+          <Route path="/mypets" element={<MyPets />} />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   );
 };
 

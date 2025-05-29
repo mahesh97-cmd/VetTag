@@ -32,13 +32,7 @@ const Home = () => {
                 to="/register"
                 className="bg-blue-800 hover:bg-blue-900 text-white px-6 py-3 rounded-lg font-semibold shadow-lg text-sm sm:text-base"
               >
-                Create Pet Profile
-              </Link>
-              <Link
-                to="/login"
-                className="border border-white text-white hover:bg-white hover:text-cyan-600 px-6 py-3 rounded-lg font-semibold text-sm sm:text-base"
-              >
-                Login
+                Register Now
               </Link>
             </div>
 

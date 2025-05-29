@@ -10,6 +10,7 @@ import { MdPets } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Header from "./Header";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
@@ -21,14 +22,14 @@ const Dashboard = () => {
   return (
     <div className="flex font-poppins min-h-screen bg-cyan-100 relative">
       <aside className="w-64 bg-cyan-400 shadow-lg p-6 hidden md:block">
-        <h2 className="text-2xl font-extrabold text-cyan-700 mb-10 flex items-center gap-2">
+        <Link to="/" className="text-2xl font-extrabold text-cyan-700 mb-10 flex items-center gap-2">
           VetTag
           <FaPaw className="text-black" />
-        </h2>
+        </Link>
         <nav className="space-y-4">
-          <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
+          <Link to="/mypets" className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
             <MdPets className="text-xl" /> My Pets
-          </button>
+          </Link>
           <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
             <FaQrcode className="text-xl" /> QR Tags
           </button>
@@ -51,10 +52,10 @@ const Dashboard = () => {
             className="fixed top-0 left-0 w-64 h-full bg-cyan-400 shadow-lg p-6 z-40 md:hidden"
           >
             <div className="flex justify-between items-center mb-10  ">
-              <h2 className="text-2xl font-extrabold text-cyan-700 flex items-center gap-2">
+              <Link to="/" className="text-2xl font-extrabold text-cyan-700 flex items-center gap-2">
                 VetTag
                 <FaPaw className="text-black" />
-              </h2>
+              </Link>
               <button
                 onClick={() => setOpen(false)}
                 className="text-cyan-700 text-lg"
