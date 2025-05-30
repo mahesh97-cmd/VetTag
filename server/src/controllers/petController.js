@@ -3,6 +3,69 @@ const QRCode = require("qrcode");
 const Pet = require("../models/petModel");
 const User = require("../models/userModel");
 
+// const addPet = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       breed,
+//       age,
+//       gender,
+//       imageUrl,
+//       vaccinations,
+//       allergies,
+//       dietaryNotes,
+//     } = req.body;
+
+//     const owner = req.user.id;
+
+
+//      let uploadedPetImageUrl = imageUrl;
+//     if (imageUrl) {
+//       const petImageUpload = await cloudinary.uploader.upload(imageUrl, {
+//         folder: "vetTag/pets",
+//       });
+//       uploadedPetImageUrl = petImageUpload.secure_url;
+//     }
+
+//     const qrCodeId = `${owner}-${Date.now()}`;
+//     const qrCodeUrl = `https://vetTag.com/pet/${qrCodeId}`;
+
+//     const qrCodeData = await QRCode.toDataURL(qrCodeUrl);
+
+//     const uploadResponse = await cloudinary.uploader.upload(qrCodeData, {
+//       folder: "vetTag/qrcodes",
+//     });
+
+//     const newPet = new Pet({
+//       owner,
+//       name,
+//       breed,
+//       age,
+//       gender,
+//       imageUrl:uploadedPetImageUrl,
+//       vaccinations,
+//       allergies,
+//       dietaryNotes,
+//       qrCodeId,
+//       qrCodeImage: uploadResponse.secure_url,
+//       lastSeenLocation: {
+//         type: "Point",
+//         coordinates: [77.5946, 12.9716],
+//       },
+//     });
+
+//     await newPet.save();
+
+//     await User.findByIdAndUpdate(owner, { $push: { pets: newPet._id } });
+
+//     res.status(201).json({ message: "Pet added successfully", pet: newPet });
+//   } catch (error) {
+//     console.error("Add pet error:", error);
+//     res.status(500).json({ message: "Server error adding pet" });
+//   }
+// };
+
+
 const addPet = async (req, res) => {
   try {
     const {
@@ -10,7 +73,6 @@ const addPet = async (req, res) => {
       breed,
       age,
       gender,
-      imageUrl,
       vaccinations,
       allergies,
       dietaryNotes,
@@ -18,10 +80,17 @@ const addPet = async (req, res) => {
 
     const owner = req.user.id;
 
+    let parsedVaccinations = [];
+    if (vaccinations) {
+      parsedVaccinations = typeof vaccinations === "string"
+        ? JSON.parse(vaccinations)
+        : vaccinations;
+    }
 
-     let uploadedPetImageUrl = imageUrl;
-    if (imageUrl) {
-      const petImageUpload = await cloudinary.uploader.upload(imageUrl, {
+    let uploadedPetImageUrl = "";
+    if (req.file) {
+      const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+      const petImageUpload = await cloudinary.uploader.upload(base64Image, {
         folder: "vetTag/pets",
       });
       uploadedPetImageUrl = petImageUpload.secure_url;
@@ -29,7 +98,6 @@ const addPet = async (req, res) => {
 
     const qrCodeId = `${owner}-${Date.now()}`;
     const qrCodeUrl = `https://vetTag.com/pet/${qrCodeId}`;
-
     const qrCodeData = await QRCode.toDataURL(qrCodeUrl);
 
     const uploadResponse = await cloudinary.uploader.upload(qrCodeData, {
@@ -42,15 +110,15 @@ const addPet = async (req, res) => {
       breed,
       age,
       gender,
-      imageUrl:uploadedPetImageUrl,
-      vaccinations,
+      imageUrl: uploadedPetImageUrl,
+      vaccinations: parsedVaccinations,
       allergies,
       dietaryNotes,
       qrCodeId,
       qrCodeImage: uploadResponse.secure_url,
       lastSeenLocation: {
         type: "Point",
-        coordinates: [77.5946, 12.9716],
+        coordinates: [77.5946, 12.9716], 
       },
     });
 
@@ -59,11 +127,15 @@ const addPet = async (req, res) => {
     await User.findByIdAndUpdate(owner, { $push: { pets: newPet._id } });
 
     res.status(201).json({ message: "Pet added successfully", pet: newPet });
+
   } catch (error) {
     console.error("Add pet error:", error);
     res.status(500).json({ message: "Server error adding pet" });
   }
 };
+
+
+
 
 const getPetsByUserId = async (req, res) => {
   try {
@@ -72,7 +144,7 @@ const getPetsByUserId = async (req, res) => {
     const pets = await Pet.find({ owner: userId }).populate(
       "owner",
       "name phone email"
-    );
+    ).sort({ createdAt: -1 });
     if (!pets || pets.length === 0) {
       return res.status(404).json({ message: "No pets found." });
     }
