@@ -8,8 +8,9 @@ const MyPets = () => {
 
   const fetchPets = async () => {
     try {
-      const res = await axios.get("/api/pets/my");
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/userAllPets`,{withCredentials:true});
       setPets(res.data.pets || []);
+      console.log(res,"all pets")
     } catch (err) {
       console.error("Error fetching pets:", err);
     } finally {
@@ -38,12 +39,12 @@ const MyPets = () => {
               className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition"
             >
               <img
-                src={pet.image}
+                src={pet.imageUrl ? pet.imageUrl : null}
                 alt={pet.name}
                 className="w-full h-40 object-cover rounded-md mb-2"
               />
               <h3 className="text-lg font-semibold text-gray-800">{pet.name}</h3>
-              <p className="text-gray-600 text-sm">{pet.type}</p>
+              <p className="text-gray-600 text-sm">{pet.breed}</p>
             </Link>
           ))}
         </div>

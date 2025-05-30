@@ -1,184 +1,250 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { FaPaw, FaUpload } from "react-icons/fa";
+import React, { useState } from "react";
+import axios from "axios";
 
-const AddPets = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    breed: "",
-    age: "",
-    gender: "Male",
-    imageUrl: "",
-    vaccinations: [],
-    allergies: "",
-    dietaryNotes: "",
-  });
+const vaccinationOptions = [
+  "Rabies",
+  "Parvo",
+  "Distemper",
+  "Hepatitis",
+  "Leptospirosis",
+];
 
+export default function AddPet() {
+  const [name, setName] = useState("");
+  const [breed, setBreed] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("Male");
+  const [allergies, setAllergies] = useState("");
+  const [dietaryNotes, setDietaryNotes] = useState("");
+  const [vaccinations, setVaccinations] = useState([]);
+  const [newVaccineName, setNewVaccineName] = useState("");
+  const [newVaccineDate, setNewVaccineDate] = useState("");
   const [imageFile, setImageFile] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleVaccinationChange = (e, index) => {
+    const updated = [...vaccinations];
+    updated[index].name = e.target.value;
+    setVaccinations(updated);
   };
 
-  const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
+  const handleVaccinationDateChange = (e, index) => {
+    const updated = [...vaccinations];
+    updated[index].date = e.target.value;
+    setVaccinations(updated);
+  };
+
+  const addVaccination = () => {
+    if (newVaccineName && newVaccineDate) {
+      setVaccinations([
+        ...vaccinations,
+        { name: newVaccineName, date: newVaccineDate },
+      ]);
+      setNewVaccineName("");
+      setNewVaccineDate("");
+    }
+  };
+
+  const removeVaccination = (index) => {
+    setVaccinations(vaccinations.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
-    });
+    if (!name || !breed || !age || !gender) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("breed", breed);
+    formData.append("age", age);
+    formData.append("gender", gender);
+    formData.append("allergies", allergies);
+    formData.append("dietaryNotes", dietaryNotes);
+    formData.append("vaccinations", JSON.stringify(vaccinations));
     if (imageFile) {
-      data.append("image", imageFile);
+      formData.append("image", imageFile);
     }
 
     try {
-      const res = await fetch("/api/pets/add", {
-        method: "POST",
-        body: data,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/addPet`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-      const result = await res.json();
-      if (res.ok) {
+      if (response.status === 201) {
         alert("Pet added successfully!");
-        setFormData({
-          name: "",
-          breed: "",
-          age: "",
-          gender: "Male",
-          imageUrl: "",
-          vaccinations: [],
-          allergies: "",
-          dietaryNotes: "",
-        });
+        setName("");
+        setBreed("");
+        setAge("");
+        setGender("");
+        setAllergies("");
+        setDietaryNotes("");
+        setVaccinations([]);
         setImageFile(null);
       } else {
-        alert(result.message || "Error adding pet");
+        alert("Error: " + response.data.message);
       }
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
+      alert("Server error: " + error.response?.data?.message || error.message);
     }
   };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6"
-    >
-      <h2 className="text-2xl font-bold text-cyan-700 mb-4 flex items-center gap-2">
-        <FaPaw className="text-yellow-500" /> Add New Pet
-      </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+  return (
+    <div className="max-w-lg mx-auto p-4 bg-white rounded shadow">
+      <h2 className="text-xl font-bold mb-4">Add Pet</h2>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div>
-          <label className="block text-gray-600 font-medium">Pet Name</label>
+          <label className="block font-semibold">Name *</label>
           <input
             type="text"
-            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2 mt-1"
+            className="border p-2 w-full rounded mb-2"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-600 font-medium">Breed</label>
-            <input
-              type="text"
-              name="breed"
-              value={formData.breed}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-600 font-medium">Age</label>
-            <input
-              type="number"
-              name="age"
-              value={formData.age}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1"
-            />
-          </div>
+        <div>
+          <label className="block font-semibold">Breed *</label>
+          <input
+            type="text"
+            value={breed}
+            onChange={(e) => setBreed(e.target.value)}
+            required
+            className="border p-2 w-full rounded mb-2"
+          />
         </div>
 
         <div>
-          <label className="block text-gray-600 font-medium">Gender</label>
+          <label className="block font-semibold">Age *</label>
+          <input
+            type="number"
+            min="0"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            required
+            className="border p-2 w-full rounded mb-2"
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold">Gender *</label>
           <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2 mt-1"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            required
+            className="border p-2 w-full rounded mb-2"
           >
             <option>Male</option>
             <option>Female</option>
+            <option>Other</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-gray-600 font-medium">Allergies (comma separated)</label>
-          <input
-            type="text"
-            name="allergies"
-            value={formData.allergies}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2 mt-1"
-          />
-        </div>
+          <label className="block font-semibold mb-2">Vaccinations</label>
 
-        <div>
-          <label className="block text-gray-600 font-medium">Dietary Notes</label>
-          <textarea
-            name="dietaryNotes"
-            value={formData.dietaryNotes}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2 mt-1"
-            rows="3"
-          ></textarea>
-        </div>
+          {vaccinations.map((v, i) => (
+            <div key={i} className="flex gap-2 items-center mb-2">
+              <select
+                value={v.name}
+                onChange={(e) => handleVaccinationChange(e, i)}
+                className="border p-2 rounded flex-1"
+              >
+                {vaccinationOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
 
-        <div>
-          <label className="block text-gray-600 font-medium">Pet Image</label>
-          <div className="flex items-center gap-4 mt-1">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="border p-2 rounded-lg"
-            />
-            {imageFile && (
-              <img
-                src={URL.createObjectURL(imageFile)}
-                alt="Preview"
-                className="w-12 h-12 rounded-full object-cover"
+              <input
+                type="date"
+                value={v.date}
+                onChange={(e) => handleVaccinationDateChange(e, i)}
+                className="border p-2 rounded"
+                required
               />
-            )}
+
+              <button
+                type="button"
+                onClick={() => removeVaccination(i)}
+                className="text-red-600 font-bold"
+                title="Remove vaccination"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+
+          <div className="flex gap-2 items-center mt-2">
+            <input
+              type="text"
+              placeholder="Vaccine Name"
+              value={newVaccineName}
+              onChange={(e) => setNewVaccineName(e.target.value)}
+              className="border p-2 rounded flex-1"
+              list="vaccines-list"
+            />
+            <datalist id="vaccines-list">
+              {vaccinationOptions.map((opt) => (
+                <option key={opt} value={opt} />
+              ))}
+            </datalist>
+
+            <input
+              type="date"
+              value={newVaccineDate}
+              onChange={(e) => setNewVaccineDate(e.target.value)}
+              className="border p-2 rounded"
+            />
+
+            <button
+              type="button"
+              onClick={addVaccination}
+              className="bg-blue-600 text-white px-3 py-1 rounded"
+            >
+              Add
+            </button>
           </div>
         </div>
 
-        <motion.button
-          type="submit"
-          whileTap={{ scale: 0.95 }}
-          className="bg-cyan-700 text-white px-6 py-2 rounded-lg hover:bg-cyan-800 transition"
-        >
-          Add Pet
-        </motion.button>
-      </form>
-    </motion.div>
-  );
-};
+        <div className="mt-4">
+          <label className="block font-semibold mb-2">Pet Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files[0])}
+            className="border p-2 rounded"
+          />
+          {imageFile && (
+            <img
+              src={URL.createObjectURL(imageFile)}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded"
+            />
+          )}
+        </div>
 
-export default AddPets;
+        <div className="mt-6">
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Add Pet
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

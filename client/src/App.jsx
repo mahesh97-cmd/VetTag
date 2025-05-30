@@ -25,9 +25,9 @@ const App = () => {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/addpets" element={<AddPets />} />
-          <Route path="/mypets" element={<MyPets />} />
+          <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="/dashboard/mypets" element={<MyPets/>}/>
+          </Route>
         </Routes>
       </BrowserRouter>
     </Provider>
