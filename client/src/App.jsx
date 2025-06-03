@@ -12,6 +12,9 @@ import MyPets from "./components/Mypets";
 import appStore from "./utils/appStore";
 import { Provider } from "react-redux";
 import {Toaster} from "react-hot-toast"
+import PetPublicProfile from "./components/petPublicProfile";
+import UpdatePetForm from "./components/UpdatePetForm";
+import UserProfile from "./components/UserProfile";
 const App = () => {
   return (
     <Provider store={appStore}>
@@ -25,8 +28,12 @@ const App = () => {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/pet/qrcode/:qrCodeId" element={<PetPublicProfile />} />
           <Route path="/dashboard" element={<Dashboard />}>
           <Route path="/dashboard/mypets" element={<MyPets/>}/>
+          <Route path="/dashboard/pets/:petId" element={<UpdatePetForm />} />
+          <Route path="/dashboard/userProfile" element={<UserProfile/>} />
+
           </Route>
         </Routes>
       </BrowserRouter>

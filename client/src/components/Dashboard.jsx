@@ -8,10 +8,8 @@ import {
 import { FaArrowLeft } from "react-icons/fa6";
 import { MdPets } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { NavLink, Link, Outlet } from "react-router-dom";
 import Header from "./Header";
-import { Link, Outlet } from "react-router-dom";
-import MyPets from "./Mypets";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
@@ -20,26 +18,34 @@ const Dashboard = () => {
     document.title = "VetTag Dashboard";
   }, []);
 
+  const linkClasses = ({ isActive }) =>
+    `flex items-center gap-3 font-medium p-2 rounded-lg w-full transition ${
+      isActive ? "bg-white text-cyan-700 shadow-md" : "text-black hover:bg-cyan-100"
+    }`;
+
   return (
     <div className="flex font-poppins min-h-screen bg-cyan-100 relative">
       <aside className="w-64 bg-cyan-400 shadow-lg p-6 hidden md:block">
-        <Link to="/" className="text-2xl font-extrabold text-cyan-700 mb-10 flex items-center gap-2">
-          VetTag
-          <FaPaw className="text-black" />
+        <Link
+          to="/"
+          className="text-2xl font-extrabold text-cyan-700 mb-10 flex items-center gap-2"
+        >
+          VetTag <FaPaw className="text-black" />
         </Link>
         <nav className="space-y-4">
-          <Link to="/dashboard/mypets" className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
+          <NavLink to="/dashboard/userProfile" className={linkClasses}>
+            <FaQrcode className="text-xl" /> Profile
+          </NavLink>
+          <NavLink to="/dashboard/mypets" className={linkClasses}>
             <MdPets className="text-xl" /> My Pets
-          </Link>
-          <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
-            <FaQrcode className="text-xl" /> QR Tags
-          </button>
-          <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
+          </NavLink>
+          
+          <NavLink to="/dashboard/lostpets" className={linkClasses}>
             <FaMapMarkedAlt className="text-xl" /> Lost Pets Map
-          </button>
-          <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
+          </NavLink>
+          <NavLink to="/dashboard/addpet" className={linkClasses}>
             <FaUser className="text-xl" /> Add Your Pet
-          </button>
+          </NavLink>
         </nav>
       </aside>
 
@@ -52,10 +58,12 @@ const Dashboard = () => {
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="fixed top-0 left-0 w-64 h-full bg-cyan-400 shadow-lg p-6 z-40 md:hidden"
           >
-            <div className="flex justify-between items-center mb-10  ">
-              <Link to="/" className="text-2xl font-extrabold text-cyan-700 flex items-center gap-2">
-                VetTag
-                <FaPaw className="text-black" />
+            <div className="flex justify-between items-center mb-10">
+              <Link
+                to="/"
+                className="text-2xl font-extrabold text-cyan-700 flex items-center gap-2"
+              >
+                VetTag <FaPaw className="text-black" />
               </Link>
               <button
                 onClick={() => setOpen(false)}
@@ -65,18 +73,35 @@ const Dashboard = () => {
               </button>
             </div>
             <nav className="space-y-4">
-              <Link to="/dashboard/mypets" className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
+              <NavLink
+                to="/dashboard/userProfile"
+                className={linkClasses}
+                onClick={() => setOpen(false)}
+              >
+                <FaQrcode className="text-xl" /> Profile
+              </NavLink>
+              <NavLink
+                to="/dashboard/mypets"
+                className={linkClasses}
+                onClick={() => setOpen(false)}
+              >
                 <MdPets className="text-xl" /> My Pets
-              </Link>
-              <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
-                <FaQrcode className="text-xl" /> QR Tags
-              </button>
-              <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
+              </NavLink>
+              
+              <NavLink
+                to="/dashboard/lostpets"
+                className={linkClasses}
+                onClick={() => setOpen(false)}
+              >
                 <FaMapMarkedAlt className="text-xl" /> Lost Pets Map
-              </button>
-              {/* <button className="flex items-center gap-3 text-black font-medium hover:bg-cyan-100 p-2 rounded-lg w-full">
-                <FaUser className="text-xl" /> Profile
-              </button> */}
+              </NavLink>
+              <NavLink
+                to="/dashboard/addpet"
+                className={linkClasses}
+                onClick={() => setOpen(false)}
+              >
+                <FaUser className="text-xl" /> Add Your Pet
+              </NavLink>
             </nav>
           </motion.aside>
         )}
@@ -84,7 +109,7 @@ const Dashboard = () => {
 
       <div className="flex-1 p-4 md:p-6">
         <Header username="Alex" setOpen={setOpen} />
-        <Outlet/>
+        <Outlet />
       </div>
     </div>
   );

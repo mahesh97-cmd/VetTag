@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import { FaUserCircle } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 const Header = ({ setOpen }) => {
+  const user=useSelector((state)=>state?.user)
+  console.log(user,"username")
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -30,7 +33,7 @@ const Header = ({ setOpen }) => {
 
       <div className="flex items-center gap-2 text-cyan-700">
         <FaUserCircle className="text-3xl" />
-        <span className="font-medium">Alex</span>
+        <span className="font-medium">{user.user?.name}</span>
       </div>
     </motion.header>
   );

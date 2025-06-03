@@ -22,7 +22,7 @@ const Login = () => {
       dispatch(addUser(res.data?.user))
       if(res?.status ===200){
         toast.success("Login successfull!")
-        navigate("/dashboard")
+        navigate("/dashboard/mypets")
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");

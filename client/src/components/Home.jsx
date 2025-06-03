@@ -5,6 +5,8 @@ import Features from "./Features";
 import HowItWorks from "./HowItsWork";
 
 const Home = () => {
+
+
   return (
     <>
     <section className="min-h-screen bg-cyan-400 flex items-center py-10">

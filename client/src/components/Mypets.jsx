@@ -8,9 +8,10 @@ const MyPets = () => {
 
   const fetchPets = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/userAllPets`,{withCredentials:true});
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/userAllPets`, {
+        withCredentials: true,
+      });
       setPets(res.data.pets || []);
-      console.log(res,"all pets")
     } catch (err) {
       console.error("Error fetching pets:", err);
     } finally {
@@ -21,6 +22,22 @@ const MyPets = () => {
   useEffect(() => {
     fetchPets();
   }, []);
+
+  const handleDownload = async (imageUrl, fileName = "VetTag_QR.png") => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download QR code:", error);
+      alert("Download failed");
+    }
+  };
 
   return (
     <div>
@@ -33,19 +50,29 @@ const MyPets = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {pets.map((pet) => (
-            <Link
-              to={`/dashboard/pets/${pet._id}`}
+            <div
               key={pet._id}
               className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition"
             >
-              <img
-                src={pet.imageUrl ? pet.imageUrl : null}
-                alt={pet.name}
-                className="w-full h-40 object-cover rounded-md mb-2"
-              />
-              <h3 className="text-lg font-semibold text-gray-800">{pet.name}</h3>
-              <p className="text-gray-600 text-sm">{pet.breed}</p>
-            </Link>
+              <Link to={`/dashboard/pets/${pet._id}`}>
+                <img
+                  src={pet.imageUrl || null}
+                  alt={pet.name}
+                  className="w-full h-40 object-cover rounded-md mb-2"
+                />
+                <h3 className="text-lg font-semibold text-gray-800">{pet.name}</h3>
+                <p className="text-gray-600 text-sm">{pet.breed}</p>
+              </Link>
+
+              {pet.qrCodeImage && (
+                <button
+                  onClick={() => handleDownload(pet.qrCodeImage, `VetTag_QR_${pet.name}.png`)}
+                  className="mt-2 bg-cyan-600 text-white px-4 py-2 rounded-md hover:bg-cyan-700 transition w-full"
+                >
+                  Download QR Code
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}

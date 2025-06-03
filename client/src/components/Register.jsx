@@ -1,10 +1,9 @@
-// src/pages/Register.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 const Register = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "",phone:"", password: "" });
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
@@ -43,6 +42,14 @@ const Register = () => {
             placeholder="Full Name"
             className="w-full p-3 border rounded-lg"
             value={form.name}
+            onChange={handleChange}
+            required
+          />
+           <input
+            name="phone"
+            placeholder="Phone"
+            className="w-full p-3 border rounded-lg"
+            value={form.phone}
             onChange={handleChange}
             required
           />

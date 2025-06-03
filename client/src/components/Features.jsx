@@ -1,5 +1,5 @@
 import { FaPaw, FaMapMarkerAlt, FaUserShield, FaClock, FaNotesMedical, FaPhoneAlt } from "react-icons/fa";
-
+import { forwardRef } from "react";
 const featureList = [
   {
     icon: <FaPaw className="text-2xl text-cyan-600" />,
@@ -61,6 +61,6 @@ const Features = () => {
       </div>
     </section>
   );
-};
+}
 
 export default Features;
