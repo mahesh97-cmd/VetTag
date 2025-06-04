@@ -33,6 +33,7 @@ const App = () => {
           <Route path="/dashboard/mypets" element={<MyPets/>}/>
           <Route path="/dashboard/pets/:petId" element={<UpdatePetForm />} />
           <Route path="/dashboard/userProfile" element={<UserProfile/>} />
+          <Route path="/dashboard/addpet" element={<AddPets/>} />
 
           </Route>
         </Routes>

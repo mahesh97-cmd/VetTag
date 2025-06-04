@@ -11,6 +11,7 @@ const vaccinationOptions = [
 
 export default function AddPet() {
   const [name, setName] = useState("");
+  const [type, setType] = useState("");
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("Male");
@@ -19,6 +20,7 @@ export default function AddPet() {
   const [vaccinations, setVaccinations] = useState([]);
   const [newVaccineName, setNewVaccineName] = useState("");
   const [newVaccineDate, setNewVaccineDate] = useState("");
+  const [newVaccineDueDate, setNewVaccineDueDate] = useState("");
   const [imageFile, setImageFile] = useState(null);
 
   const handleVaccinationChange = (e, index) => {
@@ -33,14 +35,25 @@ export default function AddPet() {
     setVaccinations(updated);
   };
 
+  const handleVaccinationDueDateChange = (e, index) => {
+    const updated = [...vaccinations];
+    updated[index].dueDate = e.target.value;
+    setVaccinations(updated);
+  };
+
   const addVaccination = () => {
-    if (newVaccineName && newVaccineDate) {
+    if (newVaccineName && newVaccineDate && newVaccineDueDate) {
       setVaccinations([
         ...vaccinations,
-        { name: newVaccineName, date: newVaccineDate },
+        {
+          name: newVaccineName,
+          date: newVaccineDate,
+          dueDate: newVaccineDueDate,
+        },
       ]);
       setNewVaccineName("");
       setNewVaccineDate("");
+      setNewVaccineDueDate("");
     }
   };
 
@@ -51,13 +64,14 @@ export default function AddPet() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !breed || !age || !gender) {
+    if (!name || !type || !breed || !age || !gender) {
       alert("Please fill all required fields");
       return;
     }
 
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("type", type);
     formData.append("breed", breed);
     formData.append("age", age);
     formData.append("gender", gender);
@@ -83,9 +97,10 @@ export default function AddPet() {
       if (response.status === 201) {
         alert("Pet added successfully!");
         setName("");
+        setType("");
         setBreed("");
         setAge("");
-        setGender("");
+        setGender("Male");
         setAllergies("");
         setDietaryNotes("");
         setVaccinations([]);
@@ -97,7 +112,6 @@ export default function AddPet() {
       alert("Server error: " + error.response?.data?.message || error.message);
     }
   };
-
 
   return (
     <div className="max-w-lg mx-auto p-4 bg-white rounded shadow">
@@ -113,7 +127,16 @@ export default function AddPet() {
             className="border p-2 w-full rounded mb-2"
           />
         </div>
-
+        <div>
+          <label className="block font-semibold">Type *</label>
+          <input
+            type="text"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            required
+            className="border p-2 w-full rounded mb-2"
+          />
+        </div>
         <div>
           <label className="block font-semibold">Breed *</label>
           <input
@@ -124,7 +147,6 @@ export default function AddPet() {
             className="border p-2 w-full rounded mb-2"
           />
         </div>
-
         <div>
           <label className="block font-semibold">Age *</label>
           <input
@@ -136,7 +158,6 @@ export default function AddPet() {
             className="border p-2 w-full rounded mb-2"
           />
         </div>
-
         <div>
           <label className="block font-semibold">Gender *</label>
           <select
@@ -147,15 +168,31 @@ export default function AddPet() {
           >
             <option>Male</option>
             <option>Female</option>
-            <option>Other</option>
+            <option>Unknown</option>
           </select>
         </div>
-
         <div>
+          <label className="block font-semibold">Allergies</label>
+          <input
+            type="text"
+            value={allergies}
+            onChange={(e) => setAllergies(e.target.value)}
+            className="border p-2 w-full rounded mb-2"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold">Dietary Notes</label>
+          <input
+            type="text"
+            value={dietaryNotes}
+            onChange={(e) => setDietaryNotes(e.target.value)}
+            className="border p-2 w-full rounded mb-2"
+          />
+        </div>
+        <div className="">
           <label className="block font-semibold mb-2">Vaccinations</label>
-
           {vaccinations.map((v, i) => (
-            <div key={i} className="flex gap-2 items-center mb-2">
+            <div key={i} className="grid grid-cols-1 gap-2 items-center mb-2">
               <select
                 value={v.name}
                 onChange={(e) => handleVaccinationChange(e, i)}
@@ -167,7 +204,7 @@ export default function AddPet() {
                   </option>
                 ))}
               </select>
-
+              <label className="block font-semibold">Date</label>
               <input
                 type="date"
                 value={v.date}
@@ -175,7 +212,14 @@ export default function AddPet() {
                 className="border p-2 rounded"
                 required
               />
-
+              <label className="block font-semibold">Due Date</label>
+              <input
+                type="date"
+                value={v.dueDate}
+                onChange={(e) => handleVaccinationDueDateChange(e, i)}
+                className="border p-2 rounded"
+                required
+              />
               <button
                 type="button"
                 onClick={() => removeVaccination(i)}
@@ -186,8 +230,7 @@ export default function AddPet() {
               </button>
             </div>
           ))}
-
-          <div className="flex gap-2 items-center mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-2 items-center mt-2">
             <input
               type="text"
               placeholder="Vaccine Name"
@@ -201,14 +244,22 @@ export default function AddPet() {
                 <option key={opt} value={opt} />
               ))}
             </datalist>
-
+            <label className="block font-semibold">Date</label>
             <input
               type="date"
+              placeholder="Date"
               value={newVaccineDate}
               onChange={(e) => setNewVaccineDate(e.target.value)}
               className="border p-2 rounded"
             />
-
+            <label className="block font-semibold">Due Date</label>
+            <input
+              type="date"
+              placeholder="Due Date"
+              value={newVaccineDueDate}
+              onChange={(e) => setNewVaccineDueDate(e.target.value)}
+              className="border p-2 rounded"
+            />
             <button
               type="button"
               onClick={addVaccination}
@@ -218,14 +269,13 @@ export default function AddPet() {
             </button>
           </div>
         </div>
-
         <div className="mt-4">
           <label className="block font-semibold mb-2">Pet Image</label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
-            className="border p-2 rounded"
+            className="border p-2 rounded w-full"
           />
           {imageFile && (
             <img
@@ -235,7 +285,6 @@ export default function AddPet() {
             />
           )}
         </div>
-
         <div className="mt-6">
           <button
             type="submit"

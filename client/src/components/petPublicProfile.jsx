@@ -72,6 +72,7 @@ const PetPublicProfile = () => {
         <p className="text-gray-700 mb-1">
           <strong>Name:</strong> {pet.owner.name}
         </p>
+        
         <p className="text-gray-700 mb-1">
           <strong>Phone:</strong> {pet?.owner?.phone}
         </p>

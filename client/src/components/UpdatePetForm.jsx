@@ -25,6 +25,7 @@ const UpdatePetForm = () => {
 
   const [formData, setFormData] = useState({
     name: "",
+    type:"",
     breed: "",
     age: "",
     gender: "",
@@ -52,6 +53,7 @@ const UpdatePetForm = () => {
         setFormData({
           ...formData,
           name: pet.name || "",
+          type:pet.type  || "",
           breed: pet.breed || "",
           age: pet.age || "",
           gender: pet.gender || "",
@@ -143,6 +145,14 @@ const UpdatePetForm = () => {
         onChange={handleChange}
         className="w-full p-2 border rounded"
         placeholder="Pet Name"
+        required
+      />
+      <input
+        name="type"
+        value={formData.type}
+        onChange={handleChange}
+        className="w-full p-2 border rounded"
+        placeholder="Dog,Cat,Cow etc.."
         required
       />
       <input

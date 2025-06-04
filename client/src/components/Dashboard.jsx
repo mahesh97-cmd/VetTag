@@ -24,94 +24,98 @@ const Dashboard = () => {
     }`;
 
   return (
-    <div className="flex font-poppins min-h-screen bg-cyan-100 relative">
-      <aside className="w-64 bg-cyan-400 shadow-lg p-6 hidden md:block">
-        <Link
-          to="/"
-          className="text-2xl font-extrabold text-cyan-700 mb-10 flex items-center gap-2"
-        >
-          VetTag <FaPaw className="text-black" />
-        </Link>
+   <div className="flex font-poppins min-h-screen bg-cyan-100">
+  <aside className="w-64 bg-cyan-400 shadow-lg p-6 hidden md:flex flex-col fixed top-0 left-0 h-screen z-30">
+    <Link
+      to="/"
+      className="text-2xl font-extrabold text-cyan-700 mb-10 flex items-center gap-2"
+    >
+      VetTag <FaPaw className="text-black" />
+    </Link>
+    <nav className="space-y-4">
+      <NavLink to="/dashboard/userProfile" className={linkClasses}>
+        <FaQrcode className="text-xl" /> Profile
+      </NavLink>
+      <NavLink to="/dashboard/mypets" className={linkClasses}>
+        <MdPets className="text-xl" /> My Pets
+      </NavLink>
+      <NavLink to="/dashboard/lostpets" className={linkClasses}>
+        <FaMapMarkedAlt className="text-xl" /> Lost Pets Map
+      </NavLink>
+      <NavLink to="/dashboard/addpet" className={linkClasses}>
+        <FaUser className="text-xl" /> Add Your Pet
+      </NavLink>
+    </nav>
+  </aside>
+
+  <AnimatePresence>
+    {open && (
+      <motion.aside
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "-100%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="fixed top-0 left-0 w-64 h-full bg-cyan-400 shadow-lg p-6 z-40 md:hidden"
+      >
+        <div className="flex justify-between items-center mb-10">
+          <Link
+            to="/"
+            className="text-2xl font-extrabold text-cyan-700 flex items-center gap-2"
+          >
+            VetTag <FaPaw className="text-black" />
+          </Link>
+          <button
+            onClick={() => setOpen(false)}
+            className="text-cyan-700 text-lg"
+          >
+            <FaArrowLeft />
+          </button>
+        </div>
         <nav className="space-y-4">
-          <NavLink to="/dashboard/userProfile" className={linkClasses}>
+          <NavLink
+            to="/dashboard/userProfile"
+            className={linkClasses}
+            onClick={() => setOpen(false)}
+          >
             <FaQrcode className="text-xl" /> Profile
           </NavLink>
-          <NavLink to="/dashboard/mypets" className={linkClasses}>
+          <NavLink
+            to="/dashboard/mypets"
+            className={linkClasses}
+            onClick={() => setOpen(false)}
+          >
             <MdPets className="text-xl" /> My Pets
           </NavLink>
-          
-          <NavLink to="/dashboard/lostpets" className={linkClasses}>
+          <NavLink
+            to="/dashboard/lostpets"
+            className={linkClasses}
+            onClick={() => setOpen(false)}
+          >
             <FaMapMarkedAlt className="text-xl" /> Lost Pets Map
           </NavLink>
-          <NavLink to="/dashboard/addpet" className={linkClasses}>
+          <NavLink
+            to="/dashboard/addpet"
+            className={linkClasses}
+            onClick={() => setOpen(false)}
+          >
             <FaUser className="text-xl" /> Add Your Pet
           </NavLink>
         </nav>
-      </aside>
+      </motion.aside>
+    )}
+  </AnimatePresence>
 
-      <AnimatePresence>
-        {open && (
-          <motion.aside
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed top-0 left-0 w-64 h-full bg-cyan-400 shadow-lg p-6 z-40 md:hidden"
-          >
-            <div className="flex justify-between items-center mb-10">
-              <Link
-                to="/"
-                className="text-2xl font-extrabold text-cyan-700 flex items-center gap-2"
-              >
-                VetTag <FaPaw className="text-black" />
-              </Link>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-cyan-700 text-lg"
-              >
-                <FaArrowLeft />
-              </button>
-            </div>
-            <nav className="space-y-4">
-              <NavLink
-                to="/dashboard/userProfile"
-                className={linkClasses}
-                onClick={() => setOpen(false)}
-              >
-                <FaQrcode className="text-xl" /> Profile
-              </NavLink>
-              <NavLink
-                to="/dashboard/mypets"
-                className={linkClasses}
-                onClick={() => setOpen(false)}
-              >
-                <MdPets className="text-xl" /> My Pets
-              </NavLink>
-              
-              <NavLink
-                to="/dashboard/lostpets"
-                className={linkClasses}
-                onClick={() => setOpen(false)}
-              >
-                <FaMapMarkedAlt className="text-xl" /> Lost Pets Map
-              </NavLink>
-              <NavLink
-                to="/dashboard/addpet"
-                className={linkClasses}
-                onClick={() => setOpen(false)}
-              >
-                <FaUser className="text-xl" /> Add Your Pet
-              </NavLink>
-            </nav>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-
-      <div className="flex-1 p-4 md:p-6">
-        <Header username="Alex" setOpen={setOpen} />
-        <Outlet />
-      </div>
+  <div className="md:ml-64 flex-1 flex flex-col h-screen overflow-hidden">
+    <div className="sticky top-0 z-20 bg-cyan-100  px-4 md:px-4 py-3">
+      <Header username="Alex" setOpen={setOpen} />
     </div>
+
+    <div className="overflow-y-auto flex-1 p-4 md:p-6">
+      <Outlet />
+    </div>
+  </div>
+</div>
+
   );
 };
 

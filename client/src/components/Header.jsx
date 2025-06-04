@@ -11,7 +11,7 @@ const Header = ({ setOpen }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="bg-white rounded-xl shadow-md px-6 py-4 mb-6 flex justify-between items-center"
+      className="bg-white rounded-xl shadow-md px-6 py-4  flex justify-between items-center"
     >
       <div className="flex items-center gap-4">
         <div className="md:hidden">

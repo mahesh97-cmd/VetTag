@@ -38,7 +38,7 @@ const MyPets = () => {
       alert("Download failed");
     }
   };
-
+console.log(pets,"pets data")
   return (
     <div>
       <h2 className="text-2xl font-bold text-cyan-700 mb-4">My Pets</h2>
@@ -61,9 +61,10 @@ const MyPets = () => {
                   className="w-full h-40 object-cover rounded-md mb-2"
                 />
                 <h3 className="text-lg font-semibold text-gray-800">{pet.name}</h3>
-                <p className="text-gray-600 text-sm">{pet.breed}</p>
+                <p className="text-gray-600 text-sm">Type: <span className="text-gray-500">{pet.type}</span></p>
+                <p className="text-gray-600 text-sm">Breed: <span className="text-gray-500">{pet.breed}</span></p>
               </Link>
-
+              <button className="mt-2 bg-cyan-400 text-white px-4 py-2 rounded-md hover:bg-cyan-700 transition ">vaccinations</button>
               {pet.qrCodeImage && (
                 <button
                   onClick={() => handleDownload(pet.qrCodeImage, `VetTag_QR_${pet.name}.png`)}
