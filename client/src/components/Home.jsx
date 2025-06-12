@@ -31,10 +31,10 @@ const Home = () => {
 
             <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link
-                to="/register"
+                to="/lostpets"
                 className="bg-blue-800 hover:bg-blue-900 text-white px-6 py-3 rounded-lg font-semibold shadow-lg text-sm sm:text-base"
               >
-                Register Now
+                Pets Near By You
               </Link>
             </div>
 

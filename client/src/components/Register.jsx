@@ -49,7 +49,7 @@ const Register = () => {
             name="phone"
             placeholder="Phone"
             className="w-full p-3 border rounded-lg"
-            value={form.phone}
+            value={form.phone}A
             onChange={handleChange}
             required
           />

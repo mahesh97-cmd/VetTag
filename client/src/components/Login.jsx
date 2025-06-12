@@ -20,9 +20,10 @@ const Login = () => {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, form,{withCredentials:true});
       console.log(res,"login") 
       dispatch(addUser(res.data?.user))
+      console.log(res.data?.user,"from login")
       if(res?.status ===200){
         toast.success("Login successfull!")
-        navigate("/dashboard/mypets")
+        navigate("/dashboard/userProfile")
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");
@@ -33,7 +34,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-cyan-100 p-6">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-cyan-700 mb-6 text-center">
-          Login to VetTag 🐶
+          Login to VetTag 
         </h2>
 
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}

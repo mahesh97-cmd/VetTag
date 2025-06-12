@@ -8,7 +8,7 @@ import {
   Autocomplete,
 } from "@react-google-maps/api";
 
-const libraries = ["places"]; 
+const libraries = ["places"];
 
 const mapContainerStyle = {
   height: "300px",
@@ -25,7 +25,7 @@ const UpdatePetForm = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    type:"",
+    type: "",
     breed: "",
     age: "",
     gender: "",
@@ -36,7 +36,7 @@ const UpdatePetForm = () => {
   });
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
@@ -50,10 +50,10 @@ const UpdatePetForm = () => {
           { withCredentials: true }
         );
         const pet = res.data.pet;
-        setFormData({
-          ...formData,
+        setFormData((prev) => ({
+          ...prev,
           name: pet.name || "",
-          type:pet.type  || "",
+          type: pet.type || "",
           breed: pet.breed || "",
           age: pet.age || "",
           gender: pet.gender || "",
@@ -66,7 +66,7 @@ const UpdatePetForm = () => {
                 lng: pet.lastSeenLocation.coordinates[0],
               }
             : centerDefault,
-        });
+        }));
       } catch (err) {
         console.error("Error fetching pet details:", err);
       }
@@ -76,33 +76,34 @@ const UpdatePetForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === "lost") {
-      setFormData({ ...formData, [name]: checked });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  const onPlaceChanged = () => {
-    if (autocompleteRef.current !== null) {
-      const place = autocompleteRef.current.getPlace();
-      if (
-        place.geometry &&
-        place.geometry.location &&
-        place.geometry.location.lat &&
-        place.geometry.location.lng
-      ) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        setFormData({
-          ...formData,
-          lastSeenCoordinates: { lat, lng },
-        });
-      } else {
-        alert("No details available for this location.");
-      }
-    }
-  };
+ const onPlaceChanged = () => {
+  if (!autocompleteRef.current) {
+    alert("Autocomplete not loaded");
+    return;
+  }
+
+  const place = autocompleteRef.current.getPlace();
+
+  if (!place || !place.geometry || !place.geometry.location) {
+    alert("Please select a location from the suggestions.");
+    return;
+  }
+
+  const lat = place.geometry.location.lat();
+  const lng = place.geometry.location.lng();
+
+  setFormData((prev) => ({
+    ...prev,
+    lastSeenCoordinates: { lat, lng },
+  }));
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,7 +153,7 @@ const UpdatePetForm = () => {
         value={formData.type}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-        placeholder="Dog,Cat,Cow etc.."
+        placeholder="Dog, Cat, Cow etc."
         required
       />
       <input
@@ -206,29 +207,38 @@ const UpdatePetForm = () => {
         Mark as Lost
       </label>
 
-      <Autocomplete
-        onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
-        onPlaceChanged={onPlaceChanged}
-      >
-        <input
-          type="text"
-          placeholder="Search location (city, colony, etc.)"
-          className="w-full p-2 border rounded"
-        />
-      </Autocomplete>
+      <div className="flex gap-2">
+        <Autocomplete
+          onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+          onPlaceChanged={onPlaceChanged}
+        >
+          <input
+            type="text"
+            placeholder="Search location (city, colony, etc.)"
+            className="w-full p-2 border rounded"
+          />
+        </Autocomplete>
+        <button
+          type="button"
+          onClick={onPlaceChanged}
+          className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700"
+        >
+          Search
+        </button>
+      </div>
 
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={14}
         center={formData.lastSeenCoordinates}
         onClick={(e) =>
-          setFormData({
-            ...formData,
+          setFormData((prev) => ({
+            ...prev,
             lastSeenCoordinates: {
               lat: e.latLng.lat(),
               lng: e.latLng.lng(),
             },
-          })
+          }))
         }
       >
         <Marker position={formData.lastSeenCoordinates} />

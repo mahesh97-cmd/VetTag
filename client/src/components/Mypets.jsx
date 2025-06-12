@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addPets } from "../utils/petSlice";
 
 const MyPets = () => {
   const [pets, setPets] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const fetchPets = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/userAllPets`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/userAllPets`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(res, "from my pets");
+      dispatch(addPets(res.data.pets));
       setPets(res.data.pets || []);
     } catch (err) {
       console.error("Error fetching pets:", err);
@@ -38,7 +47,7 @@ const MyPets = () => {
       alert("Download failed");
     }
   };
-console.log(pets,"pets data")
+  console.log(pets, "pets data");
   return (
     <div>
       <h2 className="text-2xl font-bold text-cyan-700 mb-4">My Pets</h2>
@@ -60,14 +69,27 @@ console.log(pets,"pets data")
                   alt={pet.name}
                   className="w-full h-40 object-cover rounded-md mb-2"
                 />
-                <h3 className="text-lg font-semibold text-gray-800">{pet.name}</h3>
-                <p className="text-gray-600 text-sm">Type: <span className="text-gray-500">{pet.type}</span></p>
-                <p className="text-gray-600 text-sm">Breed: <span className="text-gray-500">{pet.breed}</span></p>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {pet.name.toUpperCase()}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Type: <span className="text-gray-500">{pet.type}</span>
+                </p>
+                <p className="text-gray-600 text-sm">
+                  Breed: <span className="text-gray-500">{pet.breed}</span>
+                </p>
               </Link>
-              <button className="mt-2 bg-cyan-400 text-white px-4 py-2 rounded-md hover:bg-cyan-700 transition ">vaccinations</button>
+              <button className="mt-4 bg-cyan-400 text-white px-4 py-2 rounded-md hover:bg-cyan-700 transition ">
+                <Link to={`/dashboard/pet/vaccination/${pet._id}`}>
+                  vaccinations
+                </Link>
+              </button>
+
               {pet.qrCodeImage && (
                 <button
-                  onClick={() => handleDownload(pet.qrCodeImage, `VetTag_QR_${pet.name}.png`)}
+                  onClick={() =>
+                    handleDownload(pet.qrCodeImage, `VetTag_QR_${pet.name}.png`)
+                  }
                   className="mt-2 bg-cyan-600 text-white px-4 py-2 rounded-md hover:bg-cyan-700 transition w-full"
                 >
                   Download QR Code

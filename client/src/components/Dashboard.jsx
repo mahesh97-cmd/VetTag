@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useDebugValue, useEffect, useState } from "react";
 import {
   FaPaw,
   FaQrcode,
@@ -10,8 +10,28 @@ import { MdPets } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink, Link, Outlet } from "react-router-dom";
 import Header from "./Header";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 const Dashboard = () => {
+  const dispatch=useDispatch()
+
+const fetchProfile=async()=>{
+try {
+  const res=await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user-profile`,{withCredentials:true})
+  console.log(res.data)
+  dispatch(addUser(res.data))
+} catch (error) {
+  console.error(error)
+  console.log(error)
+}
+}
+
+useEffect(()=>{
+  fetchProfile()
+},[])
+
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -86,13 +106,13 @@ const Dashboard = () => {
           >
             <MdPets className="text-xl" /> My Pets
           </NavLink>
-          <NavLink
+          {/* <NavLink
             to="/dashboard/lostpets"
             className={linkClasses}
             onClick={() => setOpen(false)}
           >
             <FaMapMarkedAlt className="text-xl" /> Lost Pets Map
-          </NavLink>
+          </NavLink> */}
           <NavLink
             to="/dashboard/addpet"
             className={linkClasses}

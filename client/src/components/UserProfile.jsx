@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPhoneAlt, FaMapMarkerAlt, FaUserCircle } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import toast from "react-hot-toast";
 
 const UserProfile = () => {
+  const dispatch=useDispatch()
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,7 +30,11 @@ const UserProfile = () => {
         `${import.meta.env.VITE_API_BASE_URL}/user-profile`,
         { withCredentials: true }
       );
+     if(res.status===200){
+      dispatch(addUser(res.data))
       setUser(res.data);
+
+     }
       setFormData({
         name: res.data.name || "",
         phone: res.data.phone || "",
@@ -59,13 +67,16 @@ const UserProfile = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await axios.put(
+      const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/user-editProfile`,
         formData,
         { withCredentials: true }
       );
-      setUser(res.data.user);
+     if(res.status===200){
+      toast.success("Profile updated successfully")
+       setUser(res.data.user);
       setEditMode(false);
+     }
     } catch (err) {
       console.error("Update failed", err);
     }
@@ -79,7 +90,6 @@ const UserProfile = () => {
 
         <div className="text-center mb-8">
 
-          {/* <FaUserCircle className="text-cyan-400 text-6xl mx-auto drop-shadow-md" /> */}
           <h2 className="text-3xl font-bold text-cyan-700 mt-2">My Profile</h2>
         </div>
 
@@ -94,7 +104,7 @@ const UserProfile = () => {
                 className="w-full mt-1 px-4 py-2 bg-white/60 border border-cyan-200 rounded-md focus:ring-2 focus:ring-cyan-400 outline-none transition"
               />
             ) : (
-              <p className="text-gray-500 text-lg">{user.name}</p>
+              <p className="text-gray-500 text-lg">{user.name.toUpperCase()}</p>
             )}
           </div>
 

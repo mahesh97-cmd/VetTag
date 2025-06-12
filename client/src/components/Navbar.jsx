@@ -6,6 +6,7 @@ import { FaPaw } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../utils/userSlice";
 import { HashLink as Link } from 'react-router-hash-link';
+import axios from "axios";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,9 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const toggleMenu = () => setOpen(!open);
 
-  const handleLogout = () => {
+  const handleLogout =async () => {
+    const res=await axios.post(`${import.meta.env.VITE_API_BASE_URL}/logout`,{},{withCredentials:true})
+    console.log(res,"logout")
     dispatch(logout());
     setOpen(false);
   };

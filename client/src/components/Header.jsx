@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 
 const Header = ({ setOpen }) => {
   const user=useSelector((state)=>state?.user)
+  const fullName=user?.user?.name || ""
+  const firstName=fullName.split(" ")[0] || ""
   console.log(user,"username")
   return (
     <motion.header
@@ -31,9 +33,9 @@ const Header = ({ setOpen }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-cyan-700">
+      <div className="flex items-center gap-2 text-cyan-900">
         <FaUserCircle className="text-3xl" />
-        <span className="font-medium">{user.user?.name}</span>
+        <span className="font-medium">{firstName.toUpperCase()}</span>
       </div>
     </motion.header>
   );

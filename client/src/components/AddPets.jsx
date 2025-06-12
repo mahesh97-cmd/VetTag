@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const vaccinationOptions = [
   "Rabies",
@@ -22,6 +23,11 @@ export default function AddPet() {
   const [newVaccineDate, setNewVaccineDate] = useState("");
   const [newVaccineDueDate, setNewVaccineDueDate] = useState("");
   const [imageFile, setImageFile] = useState(null);
+  const [loading,setLoading]=useState(false)
+
+   useEffect(() => {
+    console.log("Vaccinations updated:", vaccinations);
+  }, [vaccinations]);
 
   const handleVaccinationChange = (e, index) => {
     const updated = [...vaccinations];
@@ -43,17 +49,17 @@ export default function AddPet() {
 
   const addVaccination = () => {
     if (newVaccineName && newVaccineDate && newVaccineDueDate) {
-      setVaccinations([
-        ...vaccinations,
-        {
-          name: newVaccineName,
-          date: newVaccineDate,
-          dueDate: newVaccineDueDate,
-        },
-      ]);
+      const newVaccine = {
+        name: newVaccineName,
+        date: newVaccineDate,
+        dueDate: newVaccineDueDate,
+      };
+      setVaccinations((prev) => [...prev, newVaccine]);
       setNewVaccineName("");
       setNewVaccineDate("");
       setNewVaccineDueDate("");
+    } else {
+      alert("Please fill all vaccine fields (Name, Date, Due Date)");
     }
   };
 
@@ -68,7 +74,7 @@ export default function AddPet() {
       alert("Please fill all required fields");
       return;
     }
-
+setLoading(true)
     const formData = new FormData();
     formData.append("name", name);
     formData.append("type", type);
@@ -81,6 +87,8 @@ export default function AddPet() {
     if (imageFile) {
       formData.append("image", imageFile);
     }
+
+    console.log("Submitting vaccinations:", vaccinations); 
 
     try {
       const response = await axios.post(
@@ -95,7 +103,7 @@ export default function AddPet() {
       );
 
       if (response.status === 201) {
-        alert("Pet added successfully!");
+        toast.success("Pet added successfully!");
         setName("");
         setType("");
         setBreed("");
@@ -109,7 +117,10 @@ export default function AddPet() {
         alert("Error: " + response.data.message);
       }
     } catch (error) {
-      alert("Server error: " + error.response?.data?.message || error.message);
+      console.error("Submission error:", error);
+      alert("Server error: " + (error.response?.data?.message || error.message));
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -189,54 +200,63 @@ export default function AddPet() {
             className="border p-2 w-full rounded mb-2"
           />
         </div>
-        <div className="">
+       <div className="mb-4">
           <label className="block font-semibold mb-2">Vaccinations</label>
           {vaccinations.map((v, i) => (
-            <div key={i} className="grid grid-cols-1 gap-2 items-center mb-2">
+            <div key={i} className="grid grid-cols-1 gap-2 mb-3 p-2 border rounded">
               <select
                 value={v.name}
                 onChange={(e) => handleVaccinationChange(e, i)}
-                className="border p-2 rounded flex-1"
+                className="border p-2 rounded"
+                required
               >
+                <option value="">Select Vaccine</option>
                 {vaccinationOptions.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt}
                   </option>
                 ))}
               </select>
-              <label className="block font-semibold">Date</label>
-              <input
-                type="date"
-                value={v.date}
-                onChange={(e) => handleVaccinationDateChange(e, i)}
-                className="border p-2 rounded"
-                required
-              />
-              <label className="block font-semibold">Due Date</label>
-              <input
-                type="date"
-                value={v.dueDate}
-                onChange={(e) => handleVaccinationDueDateChange(e, i)}
-                className="border p-2 rounded"
-                required
-              />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-sm font-semibold">Date</label>
+                  <input
+                    type="date"
+                    value={v.date}
+                    onChange={(e) => handleVaccinationDateChange(e, i)}
+                    className="border p-2 rounded w-full"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold">Due Date</label>
+                  <input
+                    type="date"
+                    value={v.dueDate}
+                    onChange={(e) => handleVaccinationDueDateChange(e, i)}
+                    className="border p-2 rounded w-full"
+                    required
+                  />
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => removeVaccination(i)}
-                className="text-red-600 font-bold"
-                title="Remove vaccination"
+                className="text-red-600 font-bold text-right"
               >
-                &times;
+                Remove
               </button>
             </div>
           ))}
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-2 items-center mt-2">
+
+          <div className="mt-3 p-3 border rounded bg-gray-50">
+            <h3 className="font-semibold mb-2">Add New Vaccine</h3>
             <input
               type="text"
               placeholder="Vaccine Name"
               value={newVaccineName}
               onChange={(e) => setNewVaccineName(e.target.value)}
-              className="border p-2 rounded flex-1"
+              className="border p-2 rounded w-full mb-2"
               list="vaccines-list"
             />
             <datalist id="vaccines-list">
@@ -244,28 +264,32 @@ export default function AddPet() {
                 <option key={opt} value={opt} />
               ))}
             </datalist>
-            <label className="block font-semibold">Date</label>
-            <input
-              type="date"
-              placeholder="Date"
-              value={newVaccineDate}
-              onChange={(e) => setNewVaccineDate(e.target.value)}
-              className="border p-2 rounded"
-            />
-            <label className="block font-semibold">Due Date</label>
-            <input
-              type="date"
-              placeholder="Due Date"
-              value={newVaccineDueDate}
-              onChange={(e) => setNewVaccineDueDate(e.target.value)}
-              className="border p-2 rounded"
-            />
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <div>
+                <label className="block text-sm font-semibold">Date</label>
+                <input
+                  type="date"
+                  value={newVaccineDate}
+                  onChange={(e) => setNewVaccineDate(e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Due Date</label>
+                <input
+                  type="date"
+                  value={newVaccineDueDate}
+                  onChange={(e) => setNewVaccineDueDate(e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+            </div>
             <button
               type="button"
               onClick={addVaccination}
-              className="bg-blue-600 text-white px-3 py-1 rounded"
+              className="bg-blue-600 text-white px-3 py-2 rounded w-full"
             >
-              Add
+              Add Vaccine
             </button>
           </div>
         </div>
@@ -287,11 +311,14 @@ export default function AddPet() {
         </div>
         <div className="mt-6">
           <button
-            type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            Add Pet
-          </button>
+  type="submit"
+  disabled={loading}
+  className={`px-4 py-2 rounded w-full ${
+    loading ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'
+  } text-white`}
+>
+  {loading ? 'Adding...' : 'Add Pet'}
+</button>
         </div>
       </form>
     </div>
